@@ -100,9 +100,11 @@ async def on_member_update(before, after):
         if f"{before.name}#{before.discriminator}" == new:
             try:
                 old_activity = before.activity.name
-                new_activity = after.activity.name
             except:
                 old_activity = before.activity
+            try:
+                new_activity = after.activity.name
+            except:
                 new_activity = after.activity
 
             recipient = client.get_user(author.id)
