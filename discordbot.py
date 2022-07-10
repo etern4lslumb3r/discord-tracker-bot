@@ -109,8 +109,9 @@ async def on_member_update(before, after):
 
             recipient = client.get_user(author.id)
             await recipient.send(f"```Activity Changed!\nPrevious Activity: {old_activity}\nNew Current Activity: {new_activity}```")
-            #last_message = [message async for message in recipient.history(limit=1) if message.author == client.user][0]
-            #await last_message.delete()
+            last_message = [message async for message in recipient.history(limit=2)][1]
+            if "Tracking" not in last_message.content:
+                await last_message.delete()
     if state == False:
         pass
 
