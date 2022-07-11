@@ -76,7 +76,13 @@ async def on_message(message):
             state = True
             target = message.content.split()[1].strip()
             author = message.author
+
+            #########################
+            tracks[author] = target
+            #########################
+
             if target in users:
+
                 await message.channel.send(f"```Tracking {target}...```")
             else:
                 await message.channel.send(f"```User {target} not found...```")
@@ -89,8 +95,12 @@ async def on_message(message):
         author = message.author
         not_stalking.add(author)
         try:
-            previous_target = target
-            await message.channel.send(f"```No longer Tracking {previous_target}...```")
+
+            if tracks[author] == tracks.get(author, 0):
+                previous_target = target
+                await message.channel.send(f"```No longer Tracking {previous_target}...```")
+            else:
+                await message.channel.send(f"```Currently not Tracking```")
         except:
             await message.channel.send(f"```Currently not Tracking```")
 
