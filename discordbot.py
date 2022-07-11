@@ -58,9 +58,9 @@ async def on_message(message):
         await message.channel.send(help)
 
     if message.content.startswith("!s "):
-        for ex_stalker in not_stalking:
+        for ex_stalker in not_stalking.copy():
             if ex_stalker in not_stalking:
-                del not_stalking[not_stalking.index(ex_stalker)]
+                not_stalking.remove(ex_stalker)
 
         guilds = client.guilds
         users = set()
