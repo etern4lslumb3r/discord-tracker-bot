@@ -34,12 +34,14 @@ def reset_member_update_list():
 
 @client.event
 async def on_ready():
-    global member_updates, not_stalking
+    global member_updates, not_stalking, tracks
     print("{} has connected".format(client.user))
     not_stalking = set()
     for user in client.users:
         if not user.bot:
             not_stalking.add(user)
+
+    tracks = {}
 
 previous_target = ""
 
@@ -59,7 +61,7 @@ async def on_message(message):
 
     if message.content.startswith("!s "):
         for ex_stalker in not_stalking.copy():
-            if ex_stalker in not_stalking:
+            if ex_stalker in not_stalking and ex_stalker == message.author:
                 not_stalking.remove(ex_stalker)
 
         guilds = client.guilds
