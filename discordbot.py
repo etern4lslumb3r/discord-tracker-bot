@@ -10,6 +10,7 @@
 # 1) ...
 # 2) ...
 
+
 import discord
 from datetime import datetime
 import time
@@ -48,7 +49,7 @@ previous_target = ""
 
 @client.event
 async def on_message(message):
-    global state, target, author
+    global state, target, author_s
 
     if message.author == client.user:
         return
@@ -63,6 +64,7 @@ async def on_message(message):
         for ex_stalker in not_stalking.copy():
             if ex_stalker in not_stalking and ex_stalker == message.author:
                 not_stalking.remove(ex_stalker)
+        print(not_stalking)
 
         guilds = client.guilds
         users = set()
@@ -75,10 +77,10 @@ async def on_message(message):
         try:
             state = True
             target = message.content.split()[1].strip()
-            author = message.author
+            author_s = message.author
 
             #########################
-            tracks[author] = target
+            tracks[author_s] = target
             #########################
 
             if target in users:
@@ -92,11 +94,12 @@ async def on_message(message):
     if message.content.strip() == "!sd":
         state = False
         #target = message.content.split()[1]
-        author = message.author
-        not_stalking.add(author)
+        author_sd = message.author
+        not_stalking.add(author_sd)
+        print(not_stalking)
         try:
 
-            if tracks[author] == tracks.get(author, 0):
+            if tracks[author_sd] == tracks.get(author_sd, 0):
                 previous_target = target
                 await message.channel.send(f"```No longer Tracking {previous_target}...```")
             else:
@@ -113,7 +116,6 @@ async def on_member_update(before, after):
     if before.id in member_updates:
         return
     member_updates.append(before.id)
-    print(before.name)
     # if state == True:
     # Taking off if statement, this is the beginning of the statement
     name = target.split("#")[0]
@@ -129,7 +131,7 @@ async def on_member_update(before, after):
         except:
             new_activity = after.activity
 
-        recipient = client.get_user(author.id)
+        recipient = client.get_user(author_s.id)
         # new change: added following if statement
         if recipient not in not_stalking:
             await recipient.send(f"```Activity Changed!\nPrevious Activity: {old_activity}\nNew Current Activity: {new_activity}```")
