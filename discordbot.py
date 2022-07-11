@@ -34,8 +34,12 @@ def reset_member_update_list():
 
 @client.event
 async def on_ready():
-    global member_updates
+    global member_updates, not_stalking
     print("{} has connected".format(client.user))
+    not_stalking = set()
+    for user in client.users:
+        if not user.bot:
+            not_stalking.add(user)
 
 previous_target = ""
 
@@ -54,6 +58,10 @@ async def on_message(message):
         await message.channel.send(help)
 
     if message.content.startswith("!s "):
+        for ex_stalker in not_stalking:
+            if ex_stalker in not_stalking:
+                del not_stalking[not_stalking.index(ex_stalker)]
+
         guilds = client.guilds
         users = set()
         for guild in guilds:
@@ -77,6 +85,7 @@ async def on_message(message):
         state = False
         #target = message.content.split()[1]
         author = message.author
+        not_stalking.add(author)
         try:
             previous_target = target
             await message.channel.send(f"```No longer Tracking {previous_target}...```")
@@ -93,25 +102,30 @@ async def on_member_update(before, after):
         return
     member_updates.append(before.id)
     print(before.name)
-    if state == True:
-        name = target.split("#")[0]
-        identifier = target.split("#")[1]
-        new = f"{name}#{identifier}"
-        if f"{before.name}#{before.discriminator}" == new:
-            try:
-                old_activity = before.activity.name
-            except:
-                old_activity = before.activity
-            try:
-                new_activity = after.activity.name
-            except:
-                new_activity = after.activity
+    # if state == True:
+    # Taking off if statement, this is the beginning of the statement
+    name = target.split("#")[0]
+    identifier = target.split("#")[1]
+    new = f"{name}#{identifier}"
+    if f"{before.name}#{before.discriminator}" == new:
+        try:
+            old_activity = before.activity.name
+        except:
+            old_activity = before.activity
+        try:
+            new_activity = after.activity.name
+        except:
+            new_activity = after.activity
 
-            recipient = client.get_user(author.id)
+        recipient = client.get_user(author.id)
+        # new change: added following if statement
+        if recipient not in not_stalking:
             await recipient.send(f"```Activity Changed!\nPrevious Activity: {old_activity}\nNew Current Activity: {new_activity}```")
             last_message = [message async for message in recipient.history(limit=2)][1]
             if "Tracking" not in last_message.content:
                 await last_message.delete()
+    # Taking off if statement, this is the end of the statement
+    # if state == False: pass
     if state == False:
         pass
 
